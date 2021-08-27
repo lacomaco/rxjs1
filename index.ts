@@ -7,7 +7,9 @@ import {
   debounceTime,
   mergeMap,
   tap,
-  partition
+  partition,
+  Subject,
+  publish
 } from 'rxjs';
 import {
   catchError,
@@ -15,13 +17,17 @@ import {
   filter,
   finalize,
   retry,
+  share,
   switchMap
 } from 'rxjs/operators';
+
+const subject = new Subject();
 
 const keyup$ = fromEvent(document.getElementById('search'), 'keyup').pipe(
   debounceTime(1000),
   map((event: KeyboardEvent) => (event.target as HTMLInputElement).value),
-  distinctUntilChanged()
+  distinctUntilChanged(),
+  share()
 );
 
 // let [user$, reset$] = keyup$.pipe(partition(() => true));
@@ -75,3 +81,5 @@ function showLoading() {
 function hideLoading() {
   $loading.style.display = 'none';
 }
+
+keyup$.connect();
